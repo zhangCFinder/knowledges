@@ -21,7 +21,7 @@ public String getJsonByCityId(@RequestParam Integer cityId)
 为了保证RESTful风格，继续使用`@PathVariable`,采用方案针对SpringMVC进行改造。
 SpringMVC的请求处理过程中的路径匹配过程：
 
-![b8599077d060d094a4988148e58d52a1](SpringMVC RESTful 性能优化.resources/82BB3580-48F4-4E0A-8F3D-E023F3528D74.png)
+![b8599077d060d094a4988148e58d52a1](SpringMVC之RESTful 性能优化.resources/82BB3580-48F4-4E0A-8F3D-E023F3528D74.png)
 `org.springframework.web.servlet.handler.AbstractHandlerMethodMapping#lookupHandlerMethod
 (spring-webmvc-4.2.3.RELEASE) `
 路径匹配的过程中有如下代码：
