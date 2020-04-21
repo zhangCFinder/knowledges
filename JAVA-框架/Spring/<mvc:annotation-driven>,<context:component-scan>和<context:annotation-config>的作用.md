@@ -82,7 +82,7 @@ value="org.springframework.web.servlet.view.JstlView" />
 ### 三 源码分析
 
 通常如果我们希望通过注解的方式来进行Spring MVC开发，我们都会在`***-servlet.xml`中加入`<mvc:annotation-driven/>`标签来告诉Spring我们的目的，那么这个标签到底做了什么呢，我们先看看它的解析类，我们知道所有的自定义命名空间（像mvc，context等）下的标签解析都是由BeanDefinitionParser接口的子类来完成的，先看图片：
-![846e3ee6406b6f577ad60a21cba613e5](<mvc:annotation-driven_>，<context:component-scan_>和<context:annotation-config_>的作用.resources/E7F6AF87-EA31-4DD0-95CB-12D6EDAA6258.png)
+![846e3ee6406b6f577ad60a21cba613e5](<mvc:annotation-driven>,<context:component-scan>和<context:annotation-config>的作用.resources/E7F6AF87-EA31-4DD0-95CB-12D6EDAA6258.png)
 
 我们看到有多个AnnotationDrivenBeanDefinitionParser，他们是用来处理不同命名空间下的<annotation-driven/>标签的，我们今天研究的是<mvc:annotation-driven/>标签，所以我们找到对应的实现类是：org.springframework.web.servlet.config.AnnotationDrivenBeanDefinitionParser。
 
