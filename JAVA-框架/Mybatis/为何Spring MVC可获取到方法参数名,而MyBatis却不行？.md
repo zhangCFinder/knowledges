@@ -32,7 +32,7 @@ public class DefaultParameterNameDiscoverer extends PrioritizedParameterNameDisc
 
 备注：Spring使用ASM无需额外导包，因为自给自足了：
 
-![8afa7e7abb14d2654b5333597bb02167](为何Spring MVC可获取到方法参数名，而MyBatis却不行？.resources/A13F652E-D015-4535-9CE3-45A144534B62.png)
+![8afa7e7abb14d2654b5333597bb02167](为何Spring MVC可获取到方法参数名,而MyBatis却不行？.resources/A13F652E-D015-4535-9CE3-45A144534B62.png)
 
 # 2. MyBatis为何不好使？
 MyBatis是通过`接口`跟SQL语句绑定然后生成代理类来实现的。
