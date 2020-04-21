@@ -88,4 +88,4 @@
 
 好了，经过上边三个步骤，就可以进行监控了。访问页面`http://127.0.0.1:8080/{projectName}/druid/index.html`就可以访问监控页面了，druid已经将数据友好的显示到页面上了，包括每条sql执行的次数，执行的时间，最慢时间等等很多详细信息，供我们参考，找到哪些执行效率低的耗时长的语句进行优化。同时提供数据源、sql防火墙，web应用，URI监控、Session监控，spring监控等，里面有详细的各种数据信息，大家可以参考查阅。projectName是项目名称.
 
-![80ddb7f2717bbb0b4090af19b8906ee1](Druid 配置及内置监控,Web页面查看监控内容.resources/9448EDD8-794D-4381-B336-D5A3235CD097.png)
+![80ddb7f2717bbb0b4090af19b8906ee1](Druid 配置及内置监控和Web页面查看监控内容.resources/9448EDD8-794D-4381-B336-D5A3235CD097.png)
