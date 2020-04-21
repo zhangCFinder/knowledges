@@ -14,12 +14,12 @@ AnnotationMethodHandlerExceptionResolver -> ExceptionHandlerExceptionResolver**�
 * HandlerMapping的实现类的作用
 
 实现类RequestMappingHandlerMapping，它会处理@RequestMapping 注解，并将其注册到请求映射表中。
- 
+
 
 * HandlerAdapter的实现类的作用
 
 实现类RequestMappingHandlerAdapter，则是处理请求的适配器，确定调用哪个类的哪个方法，并且构造方法参数，返回值。
- 
+
 当配置了mvc:annotation-driven/后，Spring就知道了我们启用注解驱动。然后Spring通过<context:component-scan/>标签的配置，会自动为我们将扫描到的@Component，@Controller，@Service，@Repository等注解标记的组件注册到工厂中，来处理我们的请求。
 
 ### 二、使用的场景：
@@ -82,7 +82,7 @@ value="org.springframework.web.servlet.view.JstlView" />
 ### 三 源码分析
 
 通常如果我们希望通过注解的方式来进行Spring MVC开发，我们都会在`***-servlet.xml`中加入`<mvc:annotation-driven/>`标签来告诉Spring我们的目的，那么这个标签到底做了什么呢，我们先看看它的解析类，我们知道所有的自定义命名空间（像mvc，context等）下的标签解析都是由BeanDefinitionParser接口的子类来完成的，先看图片：
-![846e3ee6406b6f577ad60a21cba613e5](<mvc:annotation-driven>,<context:component-scan>和<context:annotation-config>的作用.resources/E7F6AF87-EA31-4DD0-95CB-12D6EDAA6258.png)
+![846e3ee6406b6f577ad60a21cba613e5](三个不同注解的作用.resources/E7F6AF87-EA31-4DD0-95CB-12D6EDAA6258.png)
 
 我们看到有多个AnnotationDrivenBeanDefinitionParser，他们是用来处理不同命名空间下的<annotation-driven/>标签的，我们今天研究的是<mvc:annotation-driven/>标签，所以我们找到对应的实现类是：org.springframework.web.servlet.config.AnnotationDrivenBeanDefinitionParser。
 
@@ -117,7 +117,7 @@ value="org.springframework.web.servlet.view.JstlView" />
 这需要有一个"mvc”<–>MvcNamespaceHandler这样一个映射关系，那么这个映射关系在哪里呢？就在META-INF目录下的spring.handlers:源文件中的内容：
 
     http\://www.springframework.org/schema/mvc=org.springframework.web.servlet.config.MvcNamespaceHandler  
- 
+
 这里定义了只要是http\://www.springframework.org/schema/mvc命名空间的标签，就使用org.springframework.web.servlet.config.MvcNamespaceHandler中的解析器。
 
  头文件里说的http://www.springframework.org/schema/mvc/spring-mvc-3.1.xsd，并不是真的到网上去下载这个文件，在spring.schemas文件中，定义了它指向org/springframework/web/servlet/config/spring-mvc-3.1.xsd这个文件（在jar包里）。
@@ -126,10 +126,10 @@ value="org.springframework.web.servlet.view.JstlView" />
   2. 然后需要实现一个BeanDefinitionParser接口，在接口的parse方法中，解析将来在Spring配置文件中出现的元素。（如果xsd声明可以有多个元素，需呀实现多个BeanDefinitionParser接口）
   3. 最后需要继承一个NamespaceHandlerSupport类，在它的init方法中，调用registerBeanDefinitionParser方法，将待解析的xml元素与解析器绑定。
   4. 在META-INF目录下，创建spring.schemas、spring.handlers文件，建立最高级的映射关系以便Spring进行处理。
- 
+
  ### `<mvc: annotation-driven/>` 与`<context:component-scan/>` 的区别
-  
-  
+
+
 1. `<context:component-scan/>`标签是告诉Spring 来扫描指定包下的类，并注册被`@Component，@Controller，@Service，@Repository`等注解标记的组件。
 而`<mvc:annotation-driven/>`是告知Spring，我们启用注解驱动。然后Spring会自动为我们注册上面说到的几个Bean到工厂中，来处理我们的请求。
 2. `<context:component-scan>` 有一个`use-default-filters` 属性，该属性默认为true,这就意味着会扫描指定包下的全部的标有@Component的类，并注册成bean.也就是@Component的子注解@Service,@Reposity等。
