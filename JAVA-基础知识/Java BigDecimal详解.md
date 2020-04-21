@@ -186,6 +186,7 @@ public static void main(String[] args)
     }
 ```
 # 4. Bigdecimal类型判断是否等于0（用equals方法的坑）
+
 ![1b0b4406a2ab6ec0152c22403b91b193](Java BigDecimal详解.resources/1C5C5031-755E-4CB7-A49E-DD618D66D3F5.png)
 
 Bigdecimal的equals方法不仅仅比较值的大小是否相等，
