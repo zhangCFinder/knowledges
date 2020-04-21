@@ -214,6 +214,7 @@ list.add(111);    //ERROR
 ### 上界通配符（Upper Bounds Wildcards）<? extends T>
 上界通配符 “Plate<？ extends Fruit>” 覆盖下图中蓝色的区域。
 ![ee1f711f1605fe2dc102ba6d42f6a595](Java泛型.resources/cdec0a066693684036d4bcaab4fdc1e3_b.png)
+
 上界<? extends T>不能往里存，只能往外取
 ```java
 Plate<? extends Fruit> p=new Plate<Apple>(new Apple());
@@ -369,6 +370,7 @@ final class Test {   
     }
 ```
 编译该类:
+
 ![b3d25fca03247756ccd8b426dcd4de6a](Java泛型.resources/0_1304831469jYMp.gif.jpg)
 
 类型擦除后，List<String>和List<Integer>就都是List了。
