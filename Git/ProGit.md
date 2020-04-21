@@ -21,7 +21,9 @@
 可以理解为：使用文件快照的方式实现文件备份，但单说快照（snapshot）的话，他是某一时间点（版本）你能看到的该时间点备份文件状态的全貌，通过文件的快照（全貌）你能恢复到特定时间点（版本）的文件状态。
 
 那git版本控制图例来说明：
+
 ![13669bbef27d3d6b3ce9fbd326e8c217](ProGit.resources/v2-0bd24b80f42ce47263b0740a8c5e9f2a_hd.jpg)
+
 上图文件的初始状态是：A B C，
 
 随着时间的变化，他们可能变化成A2 B2 C3不等。
@@ -40,6 +42,7 @@ Git 中使用这种哈希值的情况很多，你将经常看到这种哈希值�
 
 
 ### SVN实现文件备份的方式是通过差异比较
+
 ![603d5c76fd239185d1da1610d5dd48e1](ProGit.resources/v2-eb2c0746f61f81154248bff8c61d4c7f_hd.jpg)
 
 每个版本只保存文件的变化，这种方式比快照方式要节省存储空间，但恢复备份的时候会花费额外的计算
@@ -100,6 +103,7 @@ pb https://github.com/paulboone/ticgit (push)
 ## 1. 分支简介
 ### 1. 数据对象（blob object）
 git 中的 blob object 就是文件系统中的文件，包含 键：一个 hash 值和校验值的组合，值：文件内容。
+
 ![730e2cb408df93bf122ca8d7bcdaf55b](ProGit.resources/FF7E6C9C-FA14-4A45-ABD1-A0D94D6E5744.png)
 
 git通过` git hash-object -w`命令输出一个长度为 40 个字符的校验和。 这是一个 SHA-1 哈希值——一个将待存储的数据外加一个头部信息（header）一起做 SHA-1 校验运算而得的校验和。
@@ -155,6 +159,7 @@ $ git cat-file -p 99f1a6d12cb4b6f19c8655fca46c3ecf317074e0
 git的分支，**其实本质上仅仅是包含所指对象校验和（长度为40的SHA-1值字符串）的文件，所以说创建一个新分支就是往一个文件中写入41个字节（40个字符和1个换行符）即为指向提交对象的指针和所有提交信息。通过HEAD指针指向当前所在的分支。**
 
 分支不过是某个 commit 的引用。
+
 ![5d739a475b2058f5fdeda2a35491be3d](ProGit.resources/89E11CD4-87C9-4860-B7DC-FC56F09A8373.png)
 
 
@@ -339,7 +344,9 @@ Your branch is ahead of 'origin/master' by 1 commit.
 3. Git还会自动提示我们当前master分支比远程的master分支要超前1个提交。
 
 4. 在master分支上同样修改readme.txt文件，并提交。master分支和feature1分支各自都分别有新的提交，变成了这样：
+
 ![78347a4512fe164e04f0e226f210928d](ProGit.resources/925240-20160423183358601-286358803.png)
+
 这种情况下，Git无法执行“快速合并”，只能试图把各自的修改合并起来，但这种合并就可能会有冲突，我们试试看：
 ```shell
 $ git merge feature1
@@ -615,11 +622,14 @@ index 6f8a38c..449b072 100644
 ```shell
 git log --pretty=oneline 文件名
 ```
+
 ![c146765ba377bd11ac852ad12213406e](ProGit.resources/20151201111018503)
+
 接下来使用git show即可显示具体的某次的改动的修改
 ```shell
 git show <git提交版本号> <文件名>
 ```
+
 ![1e61d8ba21e6a5c2364bcf2b37f72c33](ProGit.resources/20151201113613669)
 
 
@@ -639,6 +649,7 @@ git rebase -i 36224db --表示从该commit（不包含该commit）到当前HEAD�
 ## 或者
 git rebase -i HEAD~3 --表示最近三次的提交记录
 ```
+
 ![be4c8c63d94eedb0e198dc81f69e0cd2](ProGit.resources/1A268FFD-2030-4700-9796-3C1B03ADF6E1.png)
 
 git 为我们提供了以下几个命令:
@@ -659,6 +670,7 @@ s fb28c8d fix: 第三次提交
 上面的意思就是把第二次、第三次提交都合并到第一次提交上
 
 然后wq保存退出后是注释修改界面:
+
 ![db08d3bda9cfdc825a11386406dfa9f6](ProGit.resources/B5AACA55-1839-4EDE-BD9C-B89A595CF067.png)
 
 修改完注释，保存，即可完成多个commit的合并了。
@@ -857,6 +869,7 @@ The key's randomart image is:
 
 
 >7. Fast Forward 和 no fast foward
+
 ## Fast-Forward
  当前分支合并到另一分支时，如果没有分歧解决，就会直接移动文件指针。这个过程叫做fastforward。
 
@@ -868,8 +881,11 @@ The key's randomart image is:
 
 ## No fast foward 
 —no-ff (no fast foward)，使得每一次的合并都创建一个新的commit记录。即使这个commit只是fast-foward，用来避免丢失信息。
+
 ![fbcda868206961b82dff343d2a898cd4](ProGit.resources/A1B5DB47-373F-44C9-B26F-9ABD0CAF4C06.png)
+
 ![17be84c5a0d1eff016899231adbc1c6c](ProGit.resources/652C2B77-5DC9-4E27-B7C5-BA5DEECBB1CA.png)
+
 可以看出，使用no-ff后，会多生成一个commit 记录，并强制保留develop分支的开发记录（而fast-forward的话则是直接合并，看不出之前Branch的任何记录）。这对于以后代码进行分析特别有用，故有以下最佳实践。
 
 
