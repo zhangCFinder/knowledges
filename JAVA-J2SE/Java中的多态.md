@@ -1,0 +1,101 @@
+[TOC]
+#### 面向对象的三大特性：封装、继承、多态。
+
+* 多态的定义：指允许不同类的对象对同一消息做出响应。即同一消息可以根据发送对象的不同而采用多种不同的行为方式。（发送消息就是函数调用）
+* 实现多态的技术称为：动态绑定（dynamic binding），是指在执行期间判断所引用对象的实际类型，根据其实际的类型调用其相应的方法。
+* 多态的作用：消除类型之间的耦合关系
+
+#### 多态存在的三个必要条件
+* 一、要有继承；
+* 二、要有重写；
+* 三、父类引用指向子类对象。
+
+####  多态的好处：
+1. 可替换性（substitutability）。多态对已存在代码具有可替换性。例如，多态对圆Circle类工作，对其他任何圆形几何体，如圆环，也同样工作。
+
+2. 可扩充性（extensibility）。多态对代码具有可扩充性。增加新的子类不影响已存在类的多态性、继承性，以及其他特性的运行和操作。实际上新加子类更容易获得多态功能。例如，在实现了圆锥、半圆锥以及半球体的多态基础上，很容易增添球体类的多态性。
+
+3. 接口性（interface-ability）。多态是超类通过方法签名，向子类提供了一个共同接口，由子类来完善或者覆盖它而实现的。如图8.3 所示。图中超类Shape规定了两个实现多态的接口方法，computeArea()以及computeVolume()。子类，如Circle和Sphere为了实现多态，完善或者覆盖这两个接口方法。
+
+4. 灵活性（flexibility）。它在应用中体现了灵活多样的操作，提高了使用效率。
+
+5. 简化性（simplicity）。多态简化对应用软件的代码编写和修改过程，尤其在处理大量对象的运算和操作时，这个特点尤为突出和重要。
+
+#### 多态的例子
+```java
+/* 
+需求： 
+猫，狗。 
+*/  
+  
+abstract class Animal  
+{  
+    abstract void eat();  
+}  
+  
+class Cat extends Animal  
+{  
+    public void eat()  
+    {  
+        System.out.println("吃鱼");  
+    }  
+    public void catchMouse()  
+    {  
+        System.out.println("抓老鼠");  
+    }  
+}  
+  
+class Dog extends Animal  
+{  
+    public void eat()  
+    {  
+        System.out.println("吃骨头");  
+    }  
+    public void kanJia()  
+    {  
+        System.out.println("看家");  
+    }  
+}  
+  
+class DuoTaiDemo  
+{  
+    public static void main(String[] args)  
+    {  
+        function(new Cat());  
+        function(new Dog());  
+          
+        Animal a = new Cat();//向上转型  
+        a.eat();  
+          
+        Cat c = (Cat)a;//向下转型  
+        c.catchMouse();  
+          
+          
+    }  
+      
+    public static void function(Animal a)  
+    {  
+        a.eat();  
+        //用于子类型有限  
+        //或判断所属类型进而使用其特有方法  
+        if(a instanceof Cat)  
+        {  
+            Cat c = (Cat)a;  
+            c.catchMouse();  
+        }  
+        else if(a instanceof Dog)  
+        {  
+            Dog c = (Dog)a;  
+            c.kanJia();  
+        }  
+    }  
+      
+      
+}    
+
+```
+
+
+
+
+
