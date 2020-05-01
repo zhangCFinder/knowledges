@@ -1,7 +1,7 @@
 [TOC]
 > Lambda 表达式”(lambda expression)是一个匿名函数，Lambda表达式基于数学中的λ演算得名，直接对应于其中的lambda抽象(lambda abstraction)，是一个匿名函数，即没有函数名的函数。Java 8的一个大亮点是引入Lambda表达式，使用它设计的代码会更加简洁。当开发者在编写Lambda表达式时，也会随之被编译成一个函数式接口。
 
-## Lambda简介
+# 一、Lambda简介
 
 
 Lambda表达式的语法由参数列表、箭头符号->和函数体组成。函数体既可以是一个表达式，也可以是一个语句块。比如：
@@ -10,11 +10,11 @@ Lambda表达式的语法由参数列表、箭头符号->和函数体组成。函
 ```
 
 
-## Java Lambda表达式示例
+# 二、Java Lambda表达式示例
 
 下面就用一些例子来体验一下Lambda表达式。
 
-### 遍历集合
+## 遍历集合
 
 比如我们现在要遍历一个List：
 ```java
@@ -40,7 +40,7 @@ for (String s : list) {
 list.forEach(System.out::println);
 ```
 
-### 匿名类
+## 匿名类
 
 
 在Java中很多时候我们要用到匿名类，比如线程Runnable、FileFilter和Comparator等等。
@@ -120,7 +120,43 @@ catList.sort(Comparator.comparing(Cat::getWeight).reversed());
 
 到最后这种写法，已经简写到极致，而且可读性非常高。
 
-## 函数式编程
+# 三、函数式编程
+## 1. 函数式编程语法入门
+Java8中函数式编程语法能够精简代码。
+使用Consumer作为示例，它是一个函数式接口，包含一个抽象方法accept，这个方法只有输入而无输出。
+现在我们要定义一个Consumer对象，传统的方式是这样定义的：
+```java
+Consumer c = new Consumer() {
+    @Override
+    public void accept(Object o) {
+        System.out.println(o);
+    }
+};
+```
+而在Java8中，针对函数式编程接口，可以这样定义：
+```java
+Consumer c = (o) -> {
+    System.out.println(o);
+};  
+```
+
+上面已说明，函数式编程接口都**只有一个抽象方法**，因此在采用这种写法时，编译器会将这段函数编译后当作该抽象方法的实现。
+如果接口有多个抽象方法，编译器就不知道这段函数应该是实现哪个方法的了。
+因此，`=`后面的函数体我们就可以看成是accept函数的实现。
+
+* 输入：->前面的部分，即被()包围的部分。此处只有一个输入参数，实际上输入是可以有多个的，如两个参数时写法：(a, b);当然也可以没有输入，此时直接就可以是()。
+
+* 函数体：->后面的部分，即被{}包围的部分；可以是一段代码。
+
+* 输出：函数式编程可以没有返回值，也可以有返回值。如果有返回值时，需要代码段的最后一句通过`return`的方式返回对应的值。
+
+当函数体中只有一个语句时，可以去掉{}进一步简化：
+```java
+Consumer c = (o) -> System.out.println(o);
+```
+
+
+## 2. Java函数式接口
 见 [Java8新特性学习-函数式编程](https://blog.csdn.net/icarusliu/article/details/79495534)
 
 
