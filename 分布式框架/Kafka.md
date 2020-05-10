@@ -16,7 +16,7 @@ Kafka 是一种分布式的，基于发布 / 订阅的消息系统。主要设�
 
 # Kafka 基础概念
 ## 概念一：生产者与消费者
-![30338aa25689ff5a44409856cb5bac5f](Kafka 入门.resources/0FC8DD98-139C-4297-BDB5-2A4AB004D170.png)
+![30338aa25689ff5a44409856cb5bac5f](Kafka.resources/0FC8DD98-139C-4297-BDB5-2A4AB004D170.png)
 
 对于 Kafka 来说客户端有两种基本类型：生产者（Producer）和消费者（Consumer）。
 
@@ -39,7 +39,7 @@ Kafka为这两种模型提供了单一的消费者抽象模型： **消费者组
 * 假如所有的消费者都在不同的组中，那么就完全变成了发布-订阅模型。允许你广播消息给多个消费者组（不同名）。
 
 更通用的， 我们可以创建一些消费者组作为逻辑上的订阅者。每个组包含数目不等的消费者， 一个组内多个消费者可以用来扩展性能和容错。正如下图所示：
-![d234005bff9c889150587ca02e0265a9](Kafka 入门.resources/5DBE167C-61FF-4C4F-998E-5616664047CE.png)
+![d234005bff9c889150587ca02e0265a9](Kafka.resources/5DBE167C-61FF-4C4F-998E-5616664047CE.png)
 2个kafka集群托管4个分区（P0-P3），2个消费者组，消费组A有2个消费者实例，消费组B有4个。
 
 ### 如何保证消息的处理顺序
@@ -65,7 +65,7 @@ Kafka采用了一种分而治之的策略：分区。
 kafka有比传统的消息系统更强的顺序保证。
 
 ## 概念二：主题（Topic）与分区（Partition）
-![f1581effecbfbcfc980f52fb71f54a38](Kafka 入门.resources/A042E46E-9F45-4C3E-A101-B564F2374E46.png)
+![f1581effecbfbcfc980f52fb71f54a38](Kafka.resources/A042E46E-9F45-4C3E-A101-B564F2374E46.png)
 
 在 Kafka 中，消息以主题（Topic）来分类，每一个主题都对应一个「消息队列」。
 
@@ -75,7 +75,7 @@ kafka有比传统的消息系统更强的顺序保证。
 上述的 Topic 其实是逻辑上的概念，面向消费者和生产者，物理上存储的其实是 Partition，每一个 Partition 最终对应一个目录，里面存储所有的消息和索引文件。
 
 默认情况下，每一个 Topic 在创建时如果不指定 Partition 数量时只会创建 1 个 Partition。比如，我创建了一个 Topic 名字为 test ，没有指定 Partition 的数量，那么会默认创建一个 test-0 的文件夹，这里的命名规则是：`<topic_name>-<partition_id>`。
-![455c00fdc53ec16a831964aadcaeead1](Kafka 入门.resources/53088EAD-0FCF-4948-B224-992101104C8E.png)
+![455c00fdc53ec16a831964aadcaeead1](Kafka.resources/53088EAD-0FCF-4948-B224-992101104C8E.png)
 
 
 任何发布到 Partition 的消息都会被追加到 Partition 数据文件的尾部，这样的顺序写磁盘操作让 Kafka 的效率非常高（经验证，顺序写磁盘效率比随机写内存还要高，这是 Kafka 高吞吐率的一个很重要的保证）。
@@ -99,7 +99,7 @@ kafka有比传统的消息系统更强的顺序保证。
 
 当然一个分区可以被复制到多个 Broker 上来实现冗余，这样当存在 Broker 故障时可以将其分区重新分配到其他 Broker 来负责。下图是一个样例：
 
-![96d7292195890cb211e842c21643ac3d](Kafka 入门.resources/39C74D53-5F78-4B4A-B073-2665C797D232.png)
+![96d7292195890cb211e842c21643ac3d](Kafka.resources/39C74D53-5F78-4B4A-B073-2665C797D232.png)
 
 Kafka 的一个关键性质是日志保留（retention），我们可以配置主题的消息保留策略，譬如只保留一段时间的日志或者只保留特定大小的日志。当超过这些限制时，老的消息会被删除。我们也可以针对某个主题单独设置消息过期策略，这样对于不同应用可以实现个性化。
 
@@ -108,13 +108,13 @@ Kafka 的一个关键性质是日志保留（retention），我们可以配置�
 
 
 假设我们现在 Kafka 集群只有一个 Broker，我们创建 2 个 Topic 名称分别为：`「topic1」和「topic2」`，Partition 数量分别为 1、2，那么我们的根目录下就会创建如下三个文件夹：
-![5fb812fba278f14dc4a223572a9924d1](Kafka 入门.resources/1D313020-D644-4477-84E5-D786D9EDB33B.png)
+![5fb812fba278f14dc4a223572a9924d1](Kafka.resources/1D313020-D644-4477-84E5-D786D9EDB33B.png)
 
 
 在 Kafka 的文件存储中，同一个 Topic 下有多个不同的 Partition，每个 Partition 都为一个目录，而每一个目录又被平均分配成多个大小相等的 Segment File 中，Segment File 又由 index file 和 data file 组成，他们总是成对出现，后缀 ".index" 和 ".log" 分表表示 Segment 索引文件和数据文件。
 
 现在假设我们设置每个 Segment 大小为 500 MB，并启动生产者向 topic1 中写入大量数据，topic1-0 文件夹中就会产生类似如下的一些文件：
-![3f1e4e870809cd6cf71cd115521472e6](Kafka 入门.resources/E6BF68CC-F989-47FF-A525-4B2590554235.png)
+![3f1e4e870809cd6cf71cd115521472e6](Kafka.resources/E6BF68CC-F989-47FF-A525-4B2590554235.png)
 
 
 **Segment 是 Kafka 文件存储的最小单位。** Segment 文件命名规则：Partition 全局的第一个 Segment 从 0 开始，后续每个 Segment 文件名为上一个 Segment 文件最后一条消息的 offset 值。数值最大为 64 位 long 大小，19 位数字字符长度，没有数字用0填充。如 00000000000000368769.index 和 00000000000000368769.log。
@@ -122,7 +122,7 @@ Kafka 的一个关键性质是日志保留（retention），我们可以配置�
 
 以上面的一对 Segment File 为例，说明一下索引文件和数据文件对应关系：
 
-![db467cea497ed9b73fed0b86a30a3903](Kafka 入门.resources/BA3BFD1D-9C99-4380-BCE3-A0F98DA0E551.png)
+![db467cea497ed9b73fed0b86a30a3903](Kafka.resources/BA3BFD1D-9C99-4380-BCE3-A0F98DA0E551.png)
 
 其中以索引文件中元数据 `<3, 497> ` 为例，依次在数据文件中表示第 3 个 message（在全局 Partition 表示第 368769 + 3 = 368772 个 message）以及该消息的物理偏移地址为 497。
 **即offset=3，物理偏移地址position=497. 表示该消息从物理偏移位置497开始。**
@@ -147,7 +147,7 @@ Kafka 的一个关键性质是日志保留（retention），我们可以配置�
 # Kafka单机安装部署
 ## 1. 下载解压
 ```shell
-# wget http://mirrors.shu.edu.cn/apache/kafka/2.1.0/kafka_2.11-2.1.0.tgz
+# wget http://mirrors.hust.edu.cn/apache/kafka/2.5.0/kafka_2.12-2.5.0.tgz
 # tar -C /data/ -xvf kafka_2.11-2.1.0.tgz
 # cd /data/kafka_2.11-2.1.0/
 ```
@@ -156,105 +156,63 @@ Kafka 的一个关键性质是日志保留（retention），我们可以配置�
 ```shell
 # broker的全局唯一编号，不能重复
 broker.id=0
-# 内网监听
-listeners=PLAINTEXT://内网IP地址:9092
-#外网监听
-advertised.listeners=PLAINTEXT://外网IP地址:9092
+listeners=PLAINTEXT://:9092
+advertised.listeners=PLAINTEXT://本机IP地址:9092
 # 日志目录
 log.dirs=/data/kafka/logs
 # 配置zookeeper的连接（如果不是本机，需要该为ip或主机名）
 zookeeper.connect=172.18.20.14:2181,172.18.11.126:2181
 ```
+* listeners就是主要用来定义Kafka Broker的Listener的配置项。9092端口监听的就是这个IP，是kafka真正bind的地址
 
-* listeners: 学名叫监听器，其实就是告诉外部连接者要通过什么协议访问指定主机名和端口开放的 Kafka 服务。
-    
-    在公司搭建的 kafka 集群，只需要用 listeners 就行
+* advertised.listeners参数的作用就是将Broker的Listener信息发布到Zookeeper中，是暴露给外部的listeners，如果没有设置，会用listeners
 
-* advertised.listeners：和 listeners 相比多了个 advertised。
- 
-     Advertised 的含义表示宣称的、公布的，就是说这组监听器是 Broker 用于对外发布的。
+所以如果是外网访问的话，就需要将监听地址配置到listeners中。
 
-     在 docker 中或者 在类似阿里云主机上部署 kafka 集群需要用到。
-
-    
-**如果不配置的话，则在消费端，`KafkaConsumer`会长时间地在`poll(long )`方法中阻塞**
-
-原因分析：
-
-1. 服务端启动时，把配置文件中的listeners写入zookeeper，默认是localhost，相当于zookeeper中记录的是id为0的broker监听地址为localhost；
-
-2. 客户端配置的是`bootstrap.servers`，启动后先访问`bootstrap.servers`，获取zookeeper地址；
-
-3. 客户端链接到zookeeper，通过zookeeper获取broker信息；
-
-4. 客户端拿到的broker地址是localhost；
-
-5. 客户端在localhost上poll()。
-
-注：consumer.listTopics()是直接访问的broker，能正常拿到所有topic。
-
-advertised_listeners 监听器会注册在 zookeeper 中。
-
-* 当我们对`<内网 ip>:9092` 请求建立连接，kafka 服务器会通过 zookeeper 中注册的监听器，找到 `listeners` 监听器，然后通过 listeners 中找到对应的 通讯 ip 和 端口；
-* 当我们对 `<外网 ip>:9092`请求建立连接，kafka 服务器会通过 zookeeper 中注册的监听器，找到 advertised_listeners 监听器，然后通过 advertised_listeners 中找到对应的 通讯 ip 和 端口 `外网 ip:9094`；
-
-总结：advertised_listeners 是对外暴露的服务端口，真正建立连接用的是 listeners。
 ## 4. 使用kafka
+
+
 1. 启动Kafka
 ```shell
-./bin/kafka-server-start.sh ./config/server.properties 1>/dev/null 2>&1 &
+bin/kafka-server-start.sh  -daemon  config/server.properties &
 ```
-2. 创建主题（4个分区，2个副本）
+2. 创建主题（4个分区，2个副本）--2个副本需要至少2个服务器部署了kafka
 ```shell
-bin/kafka-topics.sh --create --zookeeper localhost:2181 --replication-factor 2 --partitions 4 --topic test
+bin/kafka-topics.sh --create --zookeeper localhost:2181 --replication-factor 1 --partitions 4 --topic test
 ```
-3. 查询集群描述
+3. 查看所有topic
 ```shell
-bin/kafka-topics.sh --describe --zookeeper 
+bin/kafka-topics.sh --zookeeper localhost:2181 --list
 ```
-4. 新生产者（支持0.9版本+）
+4. 删除topic
 ```shell
-bin/kafka-console-producer.sh --broker-list localhost:9092 --topic test --producer.config config/producer.properties
+bin/kafka-topics.sh  --delete --zookeeper 192.168.202.128:2181  --topic test
 ```
-5. 新消费者（支持0.9版本+）
+如果kafaka启动时加载的配置文件中server.properties没有配置delete.topic.enable=true，那么此时的删除并不是真正的删除，而是把topic标记为：marked for deletion
+另外被标记为marked for deletion的topic你可以在zookeeper客户端中通过命令获得：ls /admin/delete_topics/【topic name】，
+如果你删除了此处的topic，那么marked for deletion 标记消失
+
+5. 彻底删除topic: 
+    * 登录zookeeper客户端：命令：./bin/zkCli.sh
+    * 找到topic所在的目录：ls /brokers/topics
+    * 找到要删除的topic，执行命令：rmr /brokers/topics/test 即可，此时topic被彻底删除。
+
+6. 查询集群描述
 ```shell
-bin/kafka-console-consumer.sh --bootstrap-server localhost:9092 --topic test --new-consumer --from-beginning --consumer.config config/consumer.properties
+bin/kafka-topics.sh --describe --zookeeper localhost:2181
 ```
-6. 新消费者列表查询（支持0.9版本+）
+7. 生产者（支持0.9版本+）
 ```shell
-bin/kafka-consumer-groups.sh --new-consumer --bootstrap-server localhost:9092 --list
+bin/kafka-console-producer.sh --broker-list localhost:9092 --topic test
 ```
-7. 查看消费组列表
+**如果在安装kafka的本机创建消费者，需要使用listener中配置的IP，如果在外网，则需要使用advertised_listeners中配置的IP**
+8. 消费者（支持0.9版本+）
 ```shell
-./bin/kafka-consumer-groups.sh --bootstrap-server localhost:9092 --list
+bin/kafka-console-consumer.sh --bootstrap-server localhost:9092 --topic test --from-beginning
 ```
-8. 显示某个消费组的消费详情（支持0.9版本+）
+9. 消费者列表查询（支持0.9版本+）
 ```shell
-bin/kafka-consumer-groups.sh --new-consumer --bootstrap-server localhost:9092 --describe --group test-consumer-group
-```
-9. 平衡leader
-```shell
-bin/kafka-preferred-replica-election.sh --zookeeper zk_host:port/chroot
-```
-10. kafka自带压测命令
-```shell
-bin/kafka-producer-perf-test.sh --topic test --num-records 100 --record-size 1 --throughput 100  --producer-props bootstrap.servers=localhost:9092
-```
-11. 查看topic下某分区偏移量的最小值: 
-```shell
-./kafka-run-class.sh kafka.tools.GetOffsetShell --topic test-topic  --time -1 --broker-list master:9092 --partitions 0
-```
-12. 增加topic的partition:
-```shell
-/kafka-topics.sh --alter --topic jason_20180519 --zookeeper 10.200.10.24:2181,10.200.10.26:2181,10.200.10.29:2181 --partitions 5  
-```
-13. 删除topic，慎用，只会删除zookeeper中的元数据，消息文件须手动删除:  
-```shell
-./kafka-run-class.sh kafka.admin.DeleteTopicCommand --zookeeper master:2181 --topic yq20171220
-```
-14. 彻底删除topic: 
-```shell
-rmr /brokers/topics/【topic name】
+bin/kafka-consumer-groups.sh  --bootstrap-server localhost:9092 --list
 ```
 ## 5 . Java Api Demo
 ### 引入依赖：
