@@ -1,3 +1,3 @@
 # knowledges
-1. JAVA知识整理和总结，内容来自网络，如有侵权，请联系zhangc.finder@gmail.com
+1. 个人JAVA知识整理和总结，加入了自己的思考和理解，内容整理自网络，如有侵权，请联系zhangchao8803@126.com
 2. 从印象笔记搬家过来，便于分享。
