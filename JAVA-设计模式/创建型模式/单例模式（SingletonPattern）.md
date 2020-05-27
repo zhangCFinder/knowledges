@@ -1,3 +1,4 @@
+[TOC]
 # 一.简介
 
 单例模式可以说是最常使用的设计模式了，它的作用是确保某个类只有一个实例，自行实例化并向整个系统提供这个实例。在实际应用中，线程池、缓存、日志对象、对话框对象常被设计成单例，总之，选择单例模式就是为了避免不一致状态，下面我们将会简单说明单例模式的几种主要编写方式，从而对比出使用枚举实现单例模式的优点。
@@ -71,7 +72,7 @@ public class SingletonLazy {
     //当已经有了实例singleton后，其他线程直接使用，不用等待，如果已经实例化，则提高了并发度。而Synchronized懒汉式则每个线程在判断是否已经实例化时，都需要等待上一个线程使用完释放了才能去判断。
 5        if(singleton == null){
 6           synchronized (Singleton.class){
-7                if(singleton == null){
+7                if(singleton == null){//防止在加锁的过程中，已经被别的线程实例化
 8                    singleton = new Singleton();
 9                }
 10            }
@@ -87,54 +88,60 @@ public class SingletonLazy {
 
 * 第一层语义是可见性，可见性是指在一个线程中对该变量的修改会马上由工作内存（Work Memory）写回主内存（Main Memory），所以其它线程会马上读取到已修改的值，注意工作内存是线程独享的，主存是线程共享的。
 
-* volatile的第二层语义是禁止指令重排序优化，我们写的代码（特别是多线程代码），由于编译器优化，在实际执行的时候可能与我们编写的顺序不同。编译器只保证程序执行结果与源代码相同，却不保证实际指令的顺序与源代码相同，这在单线程并没什么问题，然而一旦引入多线程环境，这种乱序就可能导致严重问题。volatile关键字就可以从语义上解决这个问题，值得关注的是volatile的禁止指令重排序优化功能在Java 1.5后才得以实现，因此1.5前的版本仍然是不安全的，
-> 如果没有加volatile，则依旧存在问题，假设线程A执行到了第5行，它判断对象为空，于是线程A执行到第8行，去初始化这个对象，但初始化是需要耗费时间的，但是这个对象的地址其实已经存在了。此时线程B也执行到了第5行，它判断不为空，于是直接跳到12行得到了这个对象。但是，这个对象还没有被完整的初始化，得到一个没有初始化完全的对象有什么用。
+* volatile的第二层语义是禁止指令重排序优化，
+
+`singleton = new Singleton();`
+这个步骤，其实在jvm里面的执行分为三步：
+1. 在堆内存开辟内存空间。
+
+2. 在堆内存中实例化SingleTon里面的各个参数。
+
+3. 把对象指向堆内存空间。
+
+由于jvm存在乱序执行功能，所以可能在2还没执行时就先执行了3，如果此时再被切换到线程B上，由于执行了3，singleton 已经非空了，会被直接拿出来用，这样的话，就会出现异常。
+
+对 singleton变量加了volatile，就不会出现异常了。
 
 # 六.静态内部类单例模式，线程安全
 或许我们可以利用静态内部类来实现更安全的机制，静态内部类单例模式如下：
 
 ```java
-public class InnerClassSingleton implements Serializable {
-	public static int times;
-
-	private InnerClassSingleton() {
-		System.out.println("单例构造器被调用"+(++times)+"次");
-	}
-
-	private static class InnerClassHelper {
-		private static final InnerClassSingleton INSTANCE = new InnerClassSingleton();
-	}
-
-	public static final InnerClassSingleton getInstance() {
-		return InnerClassHelper.INSTANCE;
-	}
+public class SingleTon{
+  private SingleTon(){}
+ 
+  private static class SingleTonHoler{
+     private static SingleTon INSTANCE = new SingleTon();
+ }
+ 
+  public static SingleTon getInstance(){
+    return SingleTonHoler.INSTANCE;
+  }
 }
 ```
 
+静态内部类的优点是：**外部类加载时并不需要立即加载内部类，内部类不被加载则不去初始化INSTANCE，故而不占内存。** 即当SingleTon第一次被加载时，并不需要去加载SingleTonHoler，只有当getInstance()方法第一次被调用时，才会去初始化INSTANCE,第一次调用getInstance()方法会导致虚拟机加载SingleTonHoler类，这种方法 **不仅能确保线程安全，也能保证单例的唯一性，同时也延迟了单例的实例化。**
 
-正如上述代码所展示的，我们把Singleton实例放到一个静态内部类中，这样可以避免了静态实例在Singleton类的加载阶段（类加载过程的其中一个阶段的，此时只创建了Class对象，关于Class对象可以看博主另外一篇博文， 深入理解Java类型信息(Class对象)与反射机制）就创建对象，毕竟静态变量初始化是在SingletonInner类初始化时触发的，并且由于静态内部类只会被加载一次，所以这种写法也是线程安全的。
->相应的基础知识
-> 1. 什么是类级内部类？
-> 简单点说，类级内部类指的是，有static修饰的成员内部类。如果没有static修饰的成员式内部类被称为对象级内部类。
-> 2. 类级内部类相当于其外部类的static成分，它的对象与外部类对象间不存在依赖关系，因此可以直接创建。而对象级内部类的实例，是绑定在外部对象实例中的。
-> 3. 类级内部类中，可以定义静态的方法。在静态方法中只能引用外部类中的静态成员方法或变量。
-> 4. 类级内部类相当于其外部类的成员，只有在第一次被使用的时候才会被装载。
+那么，静态内部类又是如何实现线程安全的呢？
+虚拟机会保证一个类的<clinit>()方法在多线程环境中被正确地加锁、同步，如果多个线程同时去初始化一个类，那么只会有一个线程去执行这个类的<clinit>()方法，其他线程都需要阻塞等待，直到活动线程执行<clinit>()方法完毕。
+
+如果在一个类的<clinit>()方法中有耗时很长的操作，就可能造成多个进程阻塞(需要注意的是，其他线程虽然会被阻塞，但如果执行<clinit>()方法后，其他线程唤醒之后不会再次进入<clinit>()方法。同一个加载器下，一个类型只会初始化一次。)，在实际应用中，这种阻塞往往是很隐蔽的。
+
+故而，可以看出INSTANCE在创建过程中是线程安全的，所以说静态内部类形式的单例可保证线程安全，也能保证单例的唯一性，同时也延迟了单例的实例化。
+
+>init is the (or one of the) constructor(s) for the instance, and non-static field initialization.
+clinit are the static initialization blocks for the class, and static field initialization.
+上面这两句是Stack Overflow上的解析，很清楚init是instance实例构造器，对非静态变量解析初始化，而clinit是class类构造器对静态变量，静态代码块进行初始化。
+
+静态内部类也有着一个致命的缺点，就是传参的问题，由于是静态内部类的形式去创建单例的，故外部无法传递参数进去
+
 
 >  多线程缺省同步锁的知识：
->  大家都知道，在多线程开发中，为了解决并发问题，主要是通过使用synchronized来加互斥锁进行同步控
->  制， 但是在某些情况下，JVM已经隐含的为您执行了同步，这些情况下就不用自己再来进行同步控制了。
+>  大家都知道，在多线程开发中，为了解决并发问题，主要是通过使用synchronized来加互斥锁进行同步控制， 但是在某些情况下，JVM已经隐含的为您执行了同步，这些情况下就不用自己再来进行同步控制了。
 >  这些情况包括：
  1. 由静态初始化器（在静态字段上或static{}块中的初始化器）初始化数据时
  2. 访问final字段时
  3. 在创建线程之前创建对象时
  4. 线程可以看见它将要处理的对象时
-
-
->要想很简单的实现线程安全，可以采用静态初始化器的方式，它可以由JVM来保证线程的安全性。
->比如前面的饿汉式实现方式。但是这样一来，不是会浪费一定的空间吗？因为这种实现方式，会在类装载
->的时候就初始化对象，不管你需不需要。如果现在有一种方法能够让类装载的时候不去初始化对象，那不就
->解决问题了？
->一种可行的方式就是采用类级内部类，在这个类级内部类里面去创建对象实例。这样一来，只要不使用到这个类级内部类，那就不会创建对象实例，从而同步实现延迟加载和线程安全。
 
 
 # 七.从上述4种单例模式的写法中，似乎也解决了效率与懒加载的问题，但是它们都有两个共同的缺点：
@@ -478,7 +485,8 @@ import java.util.concurrent.LinkedBlockingDeque;
 
 public final class DynamicDataSourceContextHolder {
 	//重点！！！
-	private static final ThreadLocal<LinkedBlockingDeque<String>> LOOKUP_KEY_HOLDER = new ThreadLocal() {
+	private static final ThreadLocal<LinkedBlockingDeque<String>> LOOKUP_KEY_HOLDER = 
+    new ThreadLocal() {
         protected Object initialValue() {
             return new LinkedBlockingDeque();
         }
